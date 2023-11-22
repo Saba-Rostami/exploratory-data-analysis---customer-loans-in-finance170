@@ -1,6 +1,3 @@
-import psycopg2  # Use the appropriate database library for your database system
-# db_utils.py
-
 import yaml
 from sqlalchemy import create_engine
 import pandas as pd
@@ -20,17 +17,20 @@ class RDSDatabaseConnector:
         return credentials
 
     def init_engine(self):
-        # Initialize SQLAlchemy engine
+    # Initialize SQLAlchemy engine
         try:
             engine = create_engine(
                 f"postgresql://{self.credentials['RDS_USER']}:{self.credentials['RDS_PASSWORD']}@"
                 f"{self.credentials['RDS_HOST']}:{self.credentials['RDS_PORT']}/{self.credentials['RDS_DATABASE']}"
-            )
+                )
+            
             print("Connected to the database")
+            print(f"Database URL: {engine.url}")
             return engine
         except Exception as e:
             print(f"Error: Unable to connect to the database\n{str(e)}")
             return None
+
 
     def extract_data(self, table_name='loan_payments'):
         # Extract data from the RDS database
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     rds_connector = RDSDatabaseConnector()
 
     # Extract data from the loan_payments table
-    data_df = rds_connector.extract_data()
+    df = rds_connector.extract_data()
 
     # Display the extracted data
-    print(data_df.head())
+    df.head()
