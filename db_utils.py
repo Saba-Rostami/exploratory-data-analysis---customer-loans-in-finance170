@@ -67,10 +67,10 @@ class RDSDatabaseConnector:
 
 if __name__ == "__main__":
     # Create an instance of RDSDatabaseConnector
-    rds_connector = RDSDatabaseConnector()
+    connector = RDSDatabaseConnector()
 
     # Extract data from the loan_payments table
-    df = rds_connector.extract_data()
+    df = connector.extract_data()
 
     # Display the extracted data
     df.head()
