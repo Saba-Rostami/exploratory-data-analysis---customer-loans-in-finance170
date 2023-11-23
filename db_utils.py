@@ -54,7 +54,7 @@ class RDSDatabaseConnector:
         
 
     def load_from_csv(self, file_path='loan_payments.csv'):
-        # Step 9: Load data from a .csv file into a Pandas DataFrame
+        # Load data from a .csv file into a Pandas DataFrame
         try:
             data_df = pd.read_csv(file_path)
             print(f"Data loaded from {file_path}")
