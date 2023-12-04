@@ -186,6 +186,15 @@ class DataFrameInfo:
     def numeric_columns(self):
         numeric_columns = list(self.df.select_dtypes(include=['number']).columns)
         return numeric_columns
+    
+    def find_outliers(self, col):
+        Q1 = self.df[col].describe()['25%']
+        Q3 = self.df[col].describe()['75%']
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5*IQR
+        upper_bound = Q3 + 1.5*IQR
+        outliers = self.df[(self.df[col] < lower_bound) | (self.df[col] > upper_bound)]
+        return outliers
 
         
 class DataFrameTransform:
@@ -588,7 +597,7 @@ class Plotter:
 
         fig.show()
 
-    def plot_pairwise_correlation(self, cols_to_drop):
+    def plot_pairwise_correlation(self, cols_to_drop, title=None):
         correlation_matrix = self.df.select_dtypes(exclude="category").drop(columns=cols_to_drop).corr().round(2)
 
         # Create a mask to display only the lower triangle of the correlation matrix
@@ -601,8 +610,10 @@ class Plotter:
                         text_auto=True)
         fig.update_xaxes(showline=False)
         fig.update_yaxes(showline=False)
+
+        default_title = "Pairwise Correlation of Columns"
         fig.update_layout(
-            title={'text': "Pairwise Correlation of Columns",
+            title={'text': title or default_title,
                    'x': 0.50,
                    'xanchor': 'center',
                    'yanchor': 'top',
@@ -634,42 +645,5 @@ if __name__ == "__main__":
 
     # Display the extracted data
     df.head()
-
-# Create an instance of DataTransform
-data_transformer = DataTransform(df)
-
-data_transformer.convert_to_numeric('loan_amount')
-data_transformer.convert_to_numeric('int_rate')
-data_transformer.convert_to_datetime('issue_date')
-data_transformer.convert_to_categorical('grade')
-data_transformer.remove_excess_symbols('annual_inc', '$')
-
-# Get the transformed data
-transformed_data = data_transformer.get_transformed_data()
-
-# # Create an instance of DataFrameInfo
-# df_info = DataFrameInfo(df)
-
-# print(df_info.describe_columns())
-# print(df_info.extract_statistics())
-# print(df_info.count_distinct_values())
-# print(df_info.print_shape())
-# print(df_info.count_null_values())
-
-# Create an instance of DataFrameTransform
-data_transformer = DataFrameTransform(df)
-
-# Check NULL values and drop columns
-data_transformer.null_check()
-
-# Impute NULL values
-data_transformer.impute_nulls()
-
-# Check NULL values after imputation
-data_transformer.check_nulls_after_imputation()
-
-# Create an instance of the Plotter class and visualize NULL removal
-plotter = Plotter()
-plotter.visualize_null_removal(data, data_transformer.data)
 
 '''
